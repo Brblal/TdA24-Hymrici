@@ -17,7 +17,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v3
         with:
-          context: ./TDA
+          context: TDA/TDA
           tags: tda-flask:latest
           outputs: type=docker,dest=/tmp/tda-flask.tar
 
