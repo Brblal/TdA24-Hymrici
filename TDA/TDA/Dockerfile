@@ -9,4 +9,5 @@ RUN pip install pipenv
 COPY Pipfile .
 COPY Pipfile.lock .
 COPY . .
+EXPOSE 80
 CMD ["./start.sh"]
