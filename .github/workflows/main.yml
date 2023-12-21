@@ -1,9 +1,7 @@
+
 name: Build and push to TdA
 
-on:
-  push:
-    branches:
-      - main
+on: [push]
 
 jobs:
   build:
@@ -16,10 +14,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build and push multi-platform images
+      - name: Build
         uses: docker/build-push-action@v3
         with:
-          context: ./
+          context: TDA/TDA
           tags: tda-flask:latest
           outputs: type=docker,dest=/tmp/tda-flask.tar
 
