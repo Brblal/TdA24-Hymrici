@@ -10,4 +10,4 @@ COPY Pipfile .
 COPY Pipfile.lock .
 COPY . .
 EXPOSE 80
-CMD ["TDA/TDA/start.sh"]
+CMD ["start.sh"]
