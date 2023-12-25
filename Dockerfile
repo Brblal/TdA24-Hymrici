@@ -10,10 +10,10 @@ COPY Pipfile .
 COPY Pipfile.lock .
 
 RUN pipenv install --system --deploy
-RUN chmod +x start.sh
+
 COPY . .
 
 EXPOSE 80
-
-CMD ["./start.sh"]
+RUN chmod +x /app/start.sh
+CMD ["./app/start.sh"]
 
