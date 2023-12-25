@@ -15,5 +15,5 @@ COPY . .
 
 EXPOSE 80
 RUN chmod +x /app/start.sh
-CMD ["./app/start.sh"]
+CMD ["/app/start.sh"]
 
