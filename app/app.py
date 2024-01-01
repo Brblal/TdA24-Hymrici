@@ -23,7 +23,7 @@ def hello_world():  # put application's code here
     
 @app.route('/api')
 def API():
-    return jsonify({'secret': 'The cake is a lie!'})
+    return jsonify({'secret': 'The cake is a lie'})
 
 
 if __name__ == '__main__':
