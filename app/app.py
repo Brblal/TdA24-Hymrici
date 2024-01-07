@@ -28,8 +28,10 @@ def load_json_data(file_path):
         if isinstance(data, dict):
             data = {k: v.encode('utf-8').decode('utf-8') if isinstance(v, str) else v for k, v in data.items()}
         return data
-
 @app.route('/')
+def home():
+    return render_template('home.html')
+@app.route('/lecturer')
 def index():
     # Load JSON data from the 'lecturer.json' file
     data = load_json_data('data/lecturer.json')
