@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask HTML Example</title>
+</head>
+<body>
+    <h1>Welcome to Flask!</h1>
+    <p>This is a basic HTML page served using Flask.</p>
+    {{ data.first_name }}
+</body>
+<script>
+        // Accessing JSON data using JavaScript
+        var jsonData = {{ data | tojson }};
+        console.log(jsonData);
+        // You can now use jsonData in your JavaScript
+</script>
+</html>

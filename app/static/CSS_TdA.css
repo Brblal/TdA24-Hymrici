@@ -1,0 +1,18 @@
+.logo-img{
+
+    position:fixed;
+    right: -550px;
+    bottom: 10px;
+}
+.fit {
+    max-width: 20%;
+    max-height: 20%;
+  }
+.profile {
+    position:absolute;
+    right: 0px;
+}
+p {
+    font-size: 25px;
+    font: "Open Sans Regular";
+}
