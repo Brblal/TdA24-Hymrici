@@ -1,6 +1,6 @@
 # Tour de App - Flask boiler plate
 
-Šablona pro vývoj aplikace pro Tour de App společně s vytvořením a nahráním výstupu.
+Šablona pro vývoj aplikace pro Tour de App společně s vytvořením a nahráním výstupu
 
 ## Lokální spuštění
 
@@ -40,7 +40,7 @@ Návod zde: https://tourdeapp.cz/vzdelavaci-materialy/2738-instalace-dockeru-na-
 #### Spuštění
 ```
 docker build . -t tda-flask
-docker run -p 8080:80 -v ${PWD}:/app tda-flask
+docker run -p 8080:80 -v %cd%:/app tda-flask
 ```
 
 

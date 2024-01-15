@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Petra</title>
+<link rel="stylesheet" href="CSS_TdA.css">
+</head>
+<body style="background-color:#74C7D3">
+<p>{{ data.title_before | safe  }}  {{ data.first_name | safe  }} {{ data.middle_name | safe  }} {{ data.last_name | safe  }}   {{ data.title_after | safe  }}</p>
+
+<img class="profile" src="{{ data.picture_url }}" alt="pic of tutor">
+
+<p>{{ data.location | safe  }}</p>
+<p>{{ data.claim | safe  }}</p>
+<p>{{ data.bio | safe  }}</p>
+    <ul>
+        {% for tag in data.tags %}
+            <li>{{ tag.name | safe  }}</li>
+        {% endfor %}
+    </ul>
+<p>{{ data.contact.telephone_numbers | safe  }}</p>
+<p>{{ data.contact.emails | safe  }}</p>
+<p></p>
+
+
+
+</body>
+</html>
