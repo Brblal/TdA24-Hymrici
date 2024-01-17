@@ -2,6 +2,10 @@ from flask import Blueprint
 from flask_restful import Api, Resource, reqparse
 from .models import Teacher, Contact, Tag
 from . import db
+import uuid
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 api = Blueprint('api', __name__)
 api_rest = Api(api)
@@ -11,6 +15,17 @@ parser = reqparse.RequestParser()
 parser.add_argument('title_before', type=str)
 parser.add_argument('first_name', type=str)
 # Přidejte další argumenty podle potřeby
+
+def listToString(s):
+ 
+    # initialize an empty string
+    str1 = " "
+ 
+    # return string
+    return (str1.join(s))
+import uuid
+
+
 
 class LecturerResource(Resource):
     def get(self, uuid=None):
@@ -71,24 +86,43 @@ class LecturerResource(Resource):
 
             return lecturer_list, 200
 
+
+
     def post(self):
+        
         args = parser.parse_args()
+        provided_uuid = args.get("UUID")
+        if not provided_uuid:
+            # If UUID is not provided, generate a new one
+            provided_uuid = generate_uuid()
         new_teacher = Teacher(
-            title_before=args['title_before'],
-            first_name=args['first_name'],
-            # Add other attributes as needed
+            UUID=provided_uuid,
+            title_before=args.get("title_before"),
+            first_name=args.get("first_name"),
+            middle_name=args.get("middle_name"),
+            last_name=args.get("last_name"),
+            title_after=args.get("title_after"),
+            picture_url=args.get("picture_url"),
+            location=args.get("location"),
+            claim=args.get("claim"),
+            bio=args.get("bio"),
+            price_per_hour=args.get("price_per_hour")
         )
         db.session.add(new_teacher)
         db.session.commit()
 
-        # Assume you have a function to generate UUID
-        new_uuid = generate_uuid()
+        tags = [Tag(uuid=tag["uuid"], name=tag["name"]) for tag in args.get("tags", [])]
+        new_teacher.tags = tags
+        
+        
 
-        new_contact = Contact(
-            telephone_numbers="",
-            emails="",
-            teacher_id=new_uuid
-        )
+    
+       
+        telephone_numbers = listToString(args.get("contact", {}).get("telephone_numbers", []))
+
+        emails=listToString(args.get("contact", {}).get("emails", []))
+        
+        new_contact = Contact(telephone_numbers=telephone_numbers, emails=emails, teacher_id= new_teacher.UUID)
         db.session.add(new_contact)
         db.session.commit()
 
@@ -133,4 +167,3 @@ class LecturerResource(Resource):
             return {'message': 'All lecturers deleted successfully'}, 200
 
 api_rest.add_resource(LecturerResource, '/lecturer', '/lecturer/<uuid>')
-
