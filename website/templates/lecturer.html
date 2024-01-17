@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Petra</title>
-<link rel="stylesheet" href="CSS_TdA.css">
+    <meta charset="UTF-8">
+    <title>{{ teacher.first_name }} {{ teacher.last_name }} - Profil lektora</title>
+    <link rel="stylesheet" href="CSS_TdA.css">
 </head>
 <body style="background-color:#74C7D3">
-<p>{{ data.title_before | safe  }}  {{ data.first_name | safe  }} {{ data.middle_name | safe  }} {{ data.last_name | safe  }}   {{ data.title_after | safe  }}</p>
 
-<img class="profile" src="{{ data.picture_url }}" alt="pic of tutor">
+    <p>{{ teacher.title_before }} {{ teacher.first_name }} {{ teacher.middle_name }} {{ teacher.last_name }} {{ teacher.title_after }}</p>
 
-<p>{{ data.location | safe  }}</p>
-<p>{{ data.claim | safe  }}</p>
-<p>{{ data.bio | safe  }}</p>
+    <img class="profile" src="{{ teacher.picture_url }}" alt="Obrázek lektora">
+
+    <p>Místo: {{ teacher.location }}</p>
+    <p>Prohlášení: {{ teacher.claim }}</p>
+    <p>Životopis: {{ teacher.bio }}</p>
+
     <ul>
-        {% for tag in data.tags %}
-            <li>{{ tag.name | safe  }}</li>
+        {% for tag in teacher.tags %}
+            <li>{{ tag.name }}</li>
         {% endfor %}
     </ul>
-<p>{{ data.contact.telephone_numbers | safe  }}</p>
-<p>{{ data.contact.emails | safe  }}</p>
-<p></p>
 
-
+    <p>Telefonní čísla: {{ contact.telephone_numbers }}</p>
+    <p>Emaily: {{ contact.emails }}</p>
 
 </body>
 </html>

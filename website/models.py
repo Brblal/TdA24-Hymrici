@@ -31,7 +31,7 @@ class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     telephone_numbers = db.Column(db.String(100))
     emails = db.Column(db.String(100))
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.UUID'))
    
     
 
