@@ -1,12 +1,32 @@
+<!-- home.html -->
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Flask HTML Example</title>
+    <!-- Add your head content here -->
 </head>
 <body>
-    <h1>Welcome to Flask!</h1>
-    <p>This is a basic HTML page served using Flask.</p>
-
+    <!-- Display a list of lecturers with links -->
+    <ul>
+        {% for lecturer in lecturers %}
+            <li>
+                <a href="{{ url_for('views.profile', uuid=lecturer.UUID) }}">
+                    {{ lecturer.first_name }} {{ lecturer.last_name }}
+                </a>
+                {{ lecturer.claim }}
+                
+                <img class="profile" src="{{ lecturer.picture_url }}" alt="Obrázek lektora">
+                
+                <ul>
+                    {% for tag in lecturer.tags %}
+                        <li>{{ tag.name }}</li>
+                    {% endfor %}
+                </ul>
+                
+                {{ lecturer.location }}
+                {{ lecturer.price_per_hour }}
+            </li>
+        {% endfor %}
+    </ul>
 </body>
-
 </html>

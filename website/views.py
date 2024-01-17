@@ -81,10 +81,11 @@ def get_contact_by_uuid(uuid):
 
 
 @views.route('/', methods=['GET', 'POST'])
-def home():     
-
-        return render_template("home.html", user=current_user)
-
+def home():
+    # Get the list of all lecturers from the database
+    all_lecturers = Teacher.query.all()
+  
+    return render_template("home.html", user=current_user, lecturers=all_lecturers)
 
 @views.route('/lecturer/<uuid>', methods=['GET', 'POST'])
 
