@@ -115,8 +115,7 @@ class LecturerResource(Resource):
         for tag in tags:
             if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
                 tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"]))
-            else:
-                return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}, 400
+           
 
         
         telephone_numbers = str(args['contact']['telephone_numbers'])
