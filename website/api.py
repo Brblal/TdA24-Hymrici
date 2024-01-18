@@ -86,6 +86,7 @@ class LecturerResource(Resource):
             return lecturer_list, 200
 
     def post(self):
+        return 200
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=False)
         parser.add_argument('last_name', type=str, required=False)
@@ -162,9 +163,9 @@ class LecturerResource(Resource):
         }
 
         # Explicitly create a Flask Response
-        response = make_response(jsonify(response_data), 201)
+        response = make_response(jsonify(response_data), 200)
         
-        return response
+        return response, 205
 
 
     def put(self, uuid):
