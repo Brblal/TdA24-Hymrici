@@ -188,4 +188,4 @@ class LecturerResource(Resource):
             
             return {'message': 'All lecturers deleted successfully'}, 200
 
-api_rest.add_resource(LecturerResource, '/lecturer', '/lecturer/<uuid>')
+api_rest.add_resource(LecturerResource, '/lecturers', '/lecturers/<uuid>')
