@@ -86,7 +86,7 @@ class LecturerResource(Resource):
             return lecturer_list, 200
 
     def post(self):
-        return 200
+        
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=False)
         parser.add_argument('last_name', type=str, required=False)
@@ -137,7 +137,13 @@ class LecturerResource(Resource):
         tag_objects = [Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID) for tag in args.get("tags", [])]
         db.session.add_all(tag_objects)
         db.session.commit()
-        
+        tags_response = []
+        for tag in tag_objects:
+            tags_response.append({
+                "uuid": tag.uuid,
+                "name": tag.name
+                })
+
         response_data = {
             "first_name": lecturer.first_name,
             "last_name": lecturer.last_name,
@@ -149,23 +155,21 @@ class LecturerResource(Resource):
             "location": lecturer.location,
             "claim": lecturer.claim,
             "bio": lecturer.bio,
-            "tags": [
-                {
-                    "uuid": tag.uuid,  # Use the actual UUID from the database
-                    "name": tag.name
-                } for tag in tag_objects  # Assuming lecturer has a relationship with tags
-            ],
+            "tags": tags_response,  # Use the ordered list of tags
             "price_per_hour": lecturer.price_per_hour,
             "contact": {
                 "telephone_numbers": contact.telephone_numbers,
                 "emails": contact.emails
             }
-        }
+            }
+
+
+       
 
         # Explicitly create a Flask Response
         response = make_response(jsonify(response_data), 200)
         
-        return response, 205
+        return response
 
 
     def put(self, uuid):
