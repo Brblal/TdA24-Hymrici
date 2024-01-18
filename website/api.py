@@ -1,8 +1,11 @@
 from flask import Blueprint
+from flask import jsonify
+from flask import make_response
 from flask_restful import Api, Resource, reqparse
 from .models import Teacher, Contact, Tag
 from . import db
 import uuid
+from uuid import UUID
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -10,11 +13,7 @@ def generate_uuid():
 api = Blueprint('api', __name__)
 api_rest = Api(api)
 
-# Přidání parseru pro validaci vstupních dat
-parser = reqparse.RequestParser()
-parser.add_argument('title_before', type=str)
-parser.add_argument('first_name', type=str)
-# Přidejte další argumenty podle potřeby
+
 
 def listToString(s):
  
@@ -86,47 +85,70 @@ class LecturerResource(Resource):
 
             return lecturer_list, 200
 
-
-
     def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('first_name', type=str, required=True)
+        parser.add_argument('last_name', type=str, required=True)
+        parser.add_argument('uuid', type=str, required=True)
+        parser.add_argument('middle_name', type=str, required=True)
+        parser.add_argument('title_before', type=str, required=True)
+        parser.add_argument('title_after', type=str, required=True)
+        parser.add_argument('picture_url', type=str, required=True)
+        parser.add_argument('location', type=str, required=True)
+        parser.add_argument('claim', type=str, required=True)
+        parser.add_argument('bio', type=str, required=True)
+        parser.add_argument('price_per_hour', type=int, required=True)
         
+        parser.add_argument('contact', type=dict, required=True)
+        
+        parser.add_argument('tags', type=list, required=False, location='json')
+        
+
         args = parser.parse_args()
-        provided_uuid = args.get("UUID")
-        if not provided_uuid:
-            # If UUID is not provided, generate a new one
-            provided_uuid = generate_uuid()
-        new_teacher = Teacher(
-            UUID=provided_uuid,
-            title_before=args.get("title_before"),
-            first_name=args.get("first_name"),
-            middle_name=args.get("middle_name"),
-            last_name=args.get("last_name"),
-            title_after=args.get("title_after"),
-            picture_url=args.get("picture_url"),
-            location=args.get("location"),
-            claim=args.get("claim"),
-            bio=args.get("bio"),
-            price_per_hour=args.get("price_per_hour")
-        )
-        db.session.add(new_teacher)
+        # Extract and validate tags
+        tags = args.get("tags", [])
+
+        
+
+        tag_objects = []
+        for tag in tags:
+            if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
+                tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"]))
+            else:
+                return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}, 400
+
+        
+        telephone_numbers = str(args['contact']['telephone_numbers'])
+        emails = str(args['contact']['emails'])
+        uuid_str = str(args['uuid'])
+        
+        lecturer = Teacher(title_before = args['title_before'], first_name=args['first_name'], middle_name = args['middle_name'] , last_name=args['last_name'], title_after = args['title_after'] , picture_url = args['picture_url'], location = args['location'] , claim = args['claim'] , bio = args['bio'] , price_per_hour = args['price_per_hour'] , UUID=uuid_str)
+        
+        
+        db.session.add(lecturer)
         db.session.commit()
-
-        tags = [Tag(uuid=tag["uuid"], name=tag["name"]) for tag in args.get("tags", [])]
-        new_teacher.tags = tags
         
         
-
-    
-       
-        telephone_numbers = listToString(args.get("contact", {}).get("telephone_numbers", []))
-
-        emails=listToString(args.get("contact", {}).get("emails", []))
         
-        new_contact = Contact(telephone_numbers=telephone_numbers, emails=emails, teacher_id= new_teacher.UUID)
-        db.session.add(new_contact)
+        contact = Contact(telephone_numbers = telephone_numbers, emails = emails, teacher_id = lecturer.UUID)
+        db.session.add(contact)
         db.session.commit()
+        tag_objects = [Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID) for tag in args.get("tags", [])]
+        db.session.add_all(tag_objects)
+        db.session.commit()
+        
+        response_data = {
+            "first_name": lecturer.first_name,
+            "last_name": lecturer.last_name,
+            "UUID": str(lecturer.UUID)
+            
+        }
 
-        return {'message': 'Lecturer created successfully'}, 201
+        # Explicitly create a Flask Response
+        response = make_response(jsonify(response_data), 201)
+        
+        return response
+
 
     def put(self, uuid):
         args = parser.parse_args()

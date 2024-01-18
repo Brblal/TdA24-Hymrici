@@ -22,17 +22,14 @@ class Teacher(db.Model):
     location = db.Column(db.String(50)) 
     claim = db.Column(db.String(100))
     bio = db.Column(db.String(1000))
-    tags = db.relationship('Tag')
+    
     price_per_hour = db.Column(db.Integer)
-    contact = db.relationship('Contact')
+    
+    
     
     
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     telephone_numbers = db.Column(db.String(100))
     emails = db.Column(db.String(100))
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.UUID'))
-   
-    
-
-    
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
