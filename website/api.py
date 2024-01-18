@@ -87,19 +87,19 @@ class LecturerResource(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=str, required=True)
-        parser.add_argument('last_name', type=str, required=True)
+        parser.add_argument('first_name', type=str, required=False)
+        parser.add_argument('last_name', type=str, required=False)
         parser.add_argument('uuid', type=str, required=True)
-        parser.add_argument('middle_name', type=str, required=True)
-        parser.add_argument('title_before', type=str, required=True)
-        parser.add_argument('title_after', type=str, required=True)
-        parser.add_argument('picture_url', type=str, required=True)
-        parser.add_argument('location', type=str, required=True)
-        parser.add_argument('claim', type=str, required=True)
-        parser.add_argument('bio', type=str, required=True)
+        parser.add_argument('middle_name', type=str, required=False)
+        parser.add_argument('title_before', type=str, required=False)
+        parser.add_argument('title_after', type=str, required=False)
+        parser.add_argument('picture_url', type=str, required=False)
+        parser.add_argument('location', type=str, required=False)
+        parser.add_argument('claim', type=str, required=False)
+        parser.add_argument('bio', type=str, required=False)
         parser.add_argument('price_per_hour', type=int, required=True)
         
-        parser.add_argument('contact', type=dict, required=True)
+        parser.add_argument('contact', type=dict, required=False)
         
         parser.add_argument('tags', type=list, required=False, location='json')
         
@@ -140,8 +140,25 @@ class LecturerResource(Resource):
         response_data = {
             "first_name": lecturer.first_name,
             "last_name": lecturer.last_name,
-            "UUID": str(lecturer.UUID)
-            
+            "uuid": str(lecturer.UUID),
+            "title_before": lecturer.title_before,
+            "middle_name": lecturer.middle_name,
+            "title_after": lecturer.title_after,
+            "picture_url": lecturer.picture_url,
+            "location": lecturer.location,
+            "claim": lecturer.claim,
+            "bio": lecturer.bio,
+            "tags": [
+                {
+                    "uuid": tag.uuid,  # Use the actual UUID from the database
+                    "name": tag.name
+                } for tag in tag_objects  # Assuming lecturer has a relationship with tags
+            ],
+            "price_per_hour": lecturer.price_per_hour,
+            "contact": {
+                "telephone_numbers": contact.telephone_numbers,
+                "emails": contact.emails
+            }
         }
 
         # Explicitly create a Flask Response
