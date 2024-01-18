@@ -145,7 +145,7 @@ class LecturerResource(Resource):
         }
 
         # Explicitly create a Flask Response
-        response = make_response(jsonify(response_data), 201)
+        response = make_response(jsonify(response_data), 200)
         
         return response
 
@@ -188,4 +188,4 @@ class LecturerResource(Resource):
             
             return {'message': 'All lecturers deleted successfully'}, 200
 
-api_rest.add_resource(LecturerResource, '/lecturer', '/lecturer/<uuid>')
+api_rest.add_resource(LecturerResource, '/lecturer', '/lecturers/<uuid>')
