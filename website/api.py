@@ -90,7 +90,7 @@ class LecturerResource(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=False)
         parser.add_argument('last_name', type=str, required=False)
-        parser.add_argument('uuid', type=str, required=True)
+        parser.add_argument('uuid', type=str, required=False)
         parser.add_argument('middle_name', type=str, required=False)
         parser.add_argument('title_before', type=str, required=False)
         parser.add_argument('title_after', type=str, required=False)
@@ -98,11 +98,11 @@ class LecturerResource(Resource):
         parser.add_argument('location', type=str, required=False)
         parser.add_argument('claim', type=str, required=False)
         parser.add_argument('bio', type=str, required=False)
-        parser.add_argument('price_per_hour', type=int, required=True)
+        parser.add_argument('price_per_hour', type=int, required=False)
         
         parser.add_argument('contact', type=dict, required=False)
         
-        parser.add_argument('tags', type=list, required=True, location='json')
+        parser.add_argument('tags', type=list, required=False, location='json')
         
 
         args = parser.parse_args()
@@ -124,30 +124,31 @@ class LecturerResource(Resource):
         
         db.session.add(lecturer)
         db.session.commit()
-        tag_objects = []
-        for tag in tags:
-            if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
-                existing_tag = Tag.query.filter_by(uuid=tag["uuid"]).first()
-                if existing_tag:
-                    # Update the existing tag with the new lecturer's UUID
-                    existing_tag.teacher_id = lecturer.UUID
-                    tag_objects.append(existing_tag)
+        if tags is not None:
+            tag_objects = []
+            for tag in tags:
+                if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
+                    existing_tag = Tag.query.filter_by(uuid=tag["uuid"]).first()
+                    if existing_tag:
+                        # Update the existing tag with the new lecturer's UUID
+                        existing_tag.teacher_id = lecturer.UUID
+                        tag_objects.append(existing_tag)
+                    else:
+                        tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID))
                 else:
-                    tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID))
-            else:
-                return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}
+                    return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}
         
         
             
-        db.session.add_all(tag_objects)
-        db.session.commit()
+            db.session.add_all(tag_objects)
+            db.session.commit()
         contact = Contact(telephone_numbers = telephone_numbers, emails = emails, teacher_id = lecturer.UUID)
         db.session.add(contact)
         db.session.commit()
         
         
         
-        tags_response = [{"uuid": tag.uuid, "name": tag.name} for tag in tag_objects]
+        tags_response = [{"uuid": tag.uuid, "name": tag.name} for tag in tag_objects] if tags else []
         response_data = {
             "first_name": lecturer.first_name,
             "last_name": lecturer.last_name,
