@@ -162,7 +162,8 @@ class LecturerResource(Resource):
         
         db.session.add(contact)
         db.session.commit()
-        
+        telephone_numbers_list = json.loads(contact.telephone_numbers)
+        emails_list = json.loads(contact.emails)
         
         
         tags_response = [{"uuid": tag.uuid, "name": tag.name} for tag in tag_objects] if tags else []
@@ -276,3 +277,4 @@ class LecturerResource(Resource):
             return {'message': 'All lecturers deleted successfully'}, 200
 
 api_rest.add_resource(LecturerResource, '/lecturers', '/lecturers/<uuid>')
+
