@@ -22,7 +22,7 @@ Windows
 flask --app app.py init-db
 flask --app app.py run
 ````
-(`flask is not recognized as an internal or external command, operable program or batch file.` -> Nainstalujte Flask pomocí `pip install Flask`)
+(`flask is not recognized as an internal or external command, operable program or batch file.` -> Nainstalujte Flask DRUJDJDtfufufRJDRJDpomocí `pip install Flask`)
 
 Linux / macOS
 ````
