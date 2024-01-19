@@ -102,7 +102,7 @@ class LecturerResource(Resource):
         
         parser.add_argument('contact', type=dict, required=False)
         
-        parser.add_argument('tags', type=list, required=False, location='json')
+        parser.add_argument('tags', type=list, required=True, location='json')
         
 
         args = parser.parse_args()
@@ -111,12 +111,9 @@ class LecturerResource(Resource):
 
         
 
-        tag_objects = []
-        for tag in tags:
-            if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
-                tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"]))
-           
-
+   
+            
+        
         
         telephone_numbers = str(args['contact']['telephone_numbers'])
         emails = str(args['contact']['emails'])
@@ -127,22 +124,30 @@ class LecturerResource(Resource):
         
         db.session.add(lecturer)
         db.session.commit()
+        tag_objects = []
+        for tag in tags:
+            if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
+                existing_tag = Tag.query.filter_by(uuid=tag["uuid"]).first()
+                if existing_tag:
+                    # Update the existing tag with the new lecturer's UUID
+                    existing_tag.teacher_id = lecturer.UUID
+                    tag_objects.append(existing_tag)
+                else:
+                    tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID))
+            else:
+                return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}, 400
         
         
         
+        db.session.add_all(tag_objects)
+        db.session.commit()
         contact = Contact(telephone_numbers = telephone_numbers, emails = emails, teacher_id = lecturer.UUID)
         db.session.add(contact)
         db.session.commit()
-        tag_objects = [Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID) for tag in args.get("tags", [])]
-        db.session.add_all(tag_objects)
-        db.session.commit()
-        tags_response = []
-        for tag in tag_objects:
-            tags_response.append({
-                "uuid": tag.uuid,
-                "name": tag.name
-                })
-
+        
+        
+        
+        tags_response = [{"uuid": tag.uuid, "name": tag.name} for tag in tag_objects]
         response_data = {
             "first_name": lecturer.first_name,
             "last_name": lecturer.last_name,

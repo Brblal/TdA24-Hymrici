@@ -5,7 +5,7 @@ from sqlalchemy.sql import func
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(db.String(100), unique=True)
+    uuid = db.Column(db.String(100))
     name = db.Column(db.String(100))
     teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
     
@@ -33,3 +33,4 @@ class Contact(db.Model):
     telephone_numbers = db.Column(db.String(100))
     emails = db.Column(db.String(100))
     teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
+    
