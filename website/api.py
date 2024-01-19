@@ -116,15 +116,9 @@ class LecturerResource(Resource):
         tags = args.get("tags", [])
 
         
-
-   
-         contact = Contact(
-            telephone_numbers=telephone_numbers,
-            emails=emails,
-            teacher_id=lecturer.UUID
-        )   
-        
-        
+       
+        telephone_numbers = args['contact']['telephone_numbers']
+        emails = args['contact']['emails']
         
         uuid_str = str(args['uuid'])
         
@@ -152,7 +146,20 @@ class LecturerResource(Resource):
 
             db.session.add_all(tag_objects)
             db.session.commit()
-        contact = Contact(telephone_numbers = telephone_numbers, emails = emails, teacher_id = lecturer.UUID)
+        telephone_numbers = args['contact']['telephone_numbers']
+        emails = args['contact']['emails']
+        telephone_numbers_str = json.dumps(telephone_numbers)
+        emails_str = json.dumps(emails)
+        
+        
+        contact = Contact(
+            telephone_numbers=telephone_numbers_str,
+            emails=emails_str,
+            
+            teacher_id=lecturer.UUID
+        )   
+        
+        
         db.session.add(contact)
         db.session.commit()
         
