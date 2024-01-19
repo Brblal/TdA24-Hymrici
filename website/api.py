@@ -134,8 +134,7 @@ class LecturerResource(Resource):
                     tag_objects.append(existing_tag)
                 else:
                     tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID))
-            else:
-                return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}
+            
         
         
             
