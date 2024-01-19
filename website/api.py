@@ -135,10 +135,10 @@ class LecturerResource(Resource):
                 else:
                     tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID))
             else:
-                return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}, 400
+                return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}
         
         
-        
+            
         db.session.add_all(tag_objects)
         db.session.commit()
         contact = Contact(telephone_numbers = telephone_numbers, emails = emails, teacher_id = lecturer.UUID)
