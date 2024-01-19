@@ -133,19 +133,20 @@ class LecturerResource(Resource):
         if tags is not None:
             tag_objects = []
             for tag in tags:
-                if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
-                    existing_tag = Tag.query.filter_by(uuid=tag["uuid"]).first()
-                    if existing_tag:
-                        # Update the existing tag with the new lecturer's UUID
-                        existing_tag.teacher_id = lecturer.UUID
-                        tag_objects.append(existing_tag)
-                    else:
-                        tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID))
-                else:
-                    return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}
-        
-        
+                if isinstance(tag, dict) and 'name' in tag:
+                    tag_name = tag['name']
+                    existing_tag = Tag.query.filter_by(name=tag_name).first()
             
+                if existing_tag:
+                    # Tag with the same name exists, generate a new UUID
+                    new_uuid = str(uuid.uuid4())
+                    tag_objects.append(Tag(uuid=new_uuid, name=tag_name, teacher_id=lecturer.UUID))
+                else:
+                # Tag does not exist, use the provided UUID or generate a new one
+                    tag_uuid = tag.get('uuid', str(uuid.uuid4()))
+                    tag_objects.append(Tag(uuid=tag_uuid, name=tag_name, teacher_id=lecturer.UUID))
+                
+
             db.session.add_all(tag_objects)
             db.session.commit()
         contact = Contact(telephone_numbers = telephone_numbers, emails = emails, teacher_id = lecturer.UUID)
