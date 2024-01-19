@@ -5,7 +5,9 @@ from flask_restful import Api, Resource, reqparse
 from .models import Teacher, Contact, Tag
 from . import db
 import uuid
+import json
 from uuid import UUID
+from collections import OrderedDict
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -24,7 +26,11 @@ def listToString(s):
     return (str1.join(s))
 import uuid
 
-
+class CustomJSONEncoder(json.JSONEncoder):
+    def encode(self, obj):
+        if isinstance(obj, OrderedDict):
+            return super(CustomJSONEncoder, self).encode(list(obj.items()))
+        return super(CustomJSONEncoder, self).encode(obj)
 
 class LecturerResource(Resource):
     def get(self, uuid=None):
@@ -149,7 +155,7 @@ class LecturerResource(Resource):
         
         
         tags_response = [{"uuid": tag.uuid, "name": tag.name} for tag in tag_objects] if tags else []
-        response_data = {
+        response_data = OrderedDict({
             "first_name": lecturer.first_name,
             "last_name": lecturer.last_name,
             "uuid": str(lecturer.UUID),
@@ -166,13 +172,13 @@ class LecturerResource(Resource):
                 "telephone_numbers": contact.telephone_numbers,
                 "emails": contact.emails
             }
-            }
+            })
 
 
        
 
         # Explicitly create a Flask Response
-        response = make_response(jsonify(response_data), 200)
+        response = make_response(json.dumps(response_data, cls=CustomJSONEncoder), 200)
         
         return response
 
