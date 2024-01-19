@@ -184,19 +184,63 @@ class LecturerResource(Resource):
 
 
     def put(self, uuid):
+        parser = reqparse.RequestParser()
+        parser.add_argument('first_name', type=str, required=False)
+        parser.add_argument('last_name', type=str, required=False)
+        parser.add_argument('middle_name', type=str, required=False)
+        parser.add_argument('title_before', type=str, required=False)
+        parser.add_argument('title_after', type=str, required=False)
+        parser.add_argument('picture_url', type=str, required=False)
+        parser.add_argument('location', type=str, required=False)
+        parser.add_argument('claim', type=str, required=False)
+        parser.add_argument('bio', type=str, required=False)
+        parser.add_argument('price_per_hour', type=int, required=False)
+        parser.add_argument('contact', type=dict, required=False)
+        parser.add_argument('tags', type=list, required=False, location='json')
+
         args = parser.parse_args()
         teacher = Teacher.query.filter_by(UUID=uuid).first()
 
         if teacher:
+            # Update teacher attributes
             teacher.title_before = args['title_before']
             teacher.first_name = args['first_name']
-            # Update other attributes as needed
+            teacher.middle_name = args['middle_name']
+            teacher.last_name = args['last_name']
+            teacher.title_after = args['title_after']
+            teacher.picture_url = args['picture_url']
+            teacher.location = args['location']
+            teacher.claim = args['claim']
+            teacher.bio = args['bio']
+            teacher.price_per_hour = args['price_per_hour']
+
+            # Update contact information
+            contact = Contact.query.filter_by(teacher_id=uuid).first()
+            if contact:
+                contact.telephone_numbers = str(args['contact']['telephone_numbers'])
+                contact.emails = str(args['contact']['emails'])
+            
+            # Update tags
+            tags = args.get("tags", [])
+            if tags:
+                tag_objects = []
+                for tag in tags:
+                    if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
+                        existing_tag = Tag.query.filter_by(uuid=tag["uuid"]).first()
+                        if existing_tag:
+                            existing_tag.teacher_id = teacher.UUID
+                            tag_objects.append(existing_tag)
+                        else:
+                            tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=teacher.UUID))
+
+                db.session.add_all(tag_objects)
 
             db.session.commit()
 
             return {'message': 'Lecturer updated successfully'}, 200
         else:
             return {'message': 'Lecturer not found'}, 404
+
     def delete(self, uuid=None):
         if uuid:
             # Handle DELETE request for a specific lecturer
@@ -222,4 +266,3 @@ class LecturerResource(Resource):
             return {'message': 'All lecturers deleted successfully'}, 200
 
 api_rest.add_resource(LecturerResource, '/lecturers', '/lecturers/<uuid>')
-
