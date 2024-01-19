@@ -118,11 +118,14 @@ class LecturerResource(Resource):
         
 
    
-            
+         contact = Contact(
+            telephone_numbers=telephone_numbers,
+            emails=emails,
+            teacher_id=lecturer.UUID
+        )   
         
         
-        telephone_numbers = str(args['contact']['telephone_numbers'])
-        emails = str(args['contact']['emails'])
+        
         uuid_str = str(args['uuid'])
         
         lecturer = Teacher(title_before = args['title_before'], first_name=args['first_name'], middle_name = args['middle_name'] , last_name=args['last_name'], title_after = args['title_after'] , picture_url = args['picture_url'], location = args['location'] , claim = args['claim'] , bio = args['bio'] , price_per_hour = args['price_per_hour'] , UUID=uuid_str)
@@ -170,10 +173,9 @@ class LecturerResource(Resource):
             "tags": tags_response,  # Use the ordered list of tags
             "price_per_hour": lecturer.price_per_hour,
             "contact": {
-                "telephone_numbers": contact.telephone_numbers,
-                "emails": contact.emails
-            }
-            })
+            "telephone_numbers": contact.telephone_numbers,
+            "emails": contact.emails
+            }})
 
 
        
