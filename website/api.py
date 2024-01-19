@@ -8,7 +8,7 @@ import uuid
 import json
 from uuid import UUID
 from collections import OrderedDict
-
+from flask import Flask, Response, json
 def generate_uuid():
     return str(uuid.uuid4())
 
@@ -177,8 +177,8 @@ class LecturerResource(Resource):
 
        
 
-        # Explicitly create a Flask Response
-        response = make_response(json.dumps(response_data, cls=CustomJSONEncoder), 200)
+        json_str = json.dumps(response_data, indent=2, ensure_ascii=False, sort_keys=False)
+        response = Response(json_str, content_type='application/json; charset=utf-8')
         
         return response
 
@@ -222,3 +222,4 @@ class LecturerResource(Resource):
             return {'message': 'All lecturers deleted successfully'}, 200
 
 api_rest.add_resource(LecturerResource, '/lecturers', '/lecturers/<uuid>')
+
