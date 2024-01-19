@@ -3,7 +3,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="static/CSS_TdA.css">
     <!-- Add your head content here -->
 </head>
 <body>
@@ -11,45 +10,23 @@
     <ul>
         {% for lecturer in lecturers %}
             <li>
-                <div class="container">
-
-
-
-<div class="info">
-
-{% for lecturer in lecturers %}
-    <!-- Display a list of lecturers with links -->
-    <div class="profile">
-      <img src="{{ lecturer.picture_url }}" alt="pic of tutor" width=400px height=auto>
-      </div>
-
-      <div class="info">
-
-      <p>{{ lecturer.title_before }} {{ lecturer.first_name }} {{ lecturer.middle_name }} {{ lecturer.title_after }}</p>
-      <p>{{ lecturer.location }}</p>
-      <p>{{ lecturer.claim }}</p>
-      <p>Cena za hodinu: {{ lecturer.price_per_hour }}</p>
-      <p>Telefon: {{lecturer.email}}</p>
-      <p>Email: {{lecturer.email}}</p>
-      {% for tag in lecturer.tags %}
-                        <p>{{ tag.name }}</p>
+                <a href="{{ url_for('views.profile', uuid=lecturer.t_uuid) }}">
+                    {{ lecturer.first_name }} {{ lecturer.last_name }}
+                </a>
+                {{ lecturer.claim }}
+                
+                <img class="profile" src="{{ lecturer.picture_url }}" alt="Obrázek lektora">
+                
+                <ul>
+                    {% for tag in lecturer.tags %}
+                        <li>{{ tag.name }}</li>
                     {% endfor %}
-      </div>
-      </div>
-      <div class="content-container">
+                </ul>
+                
+                {{ lecturer.location }}
+                {{ lecturer.price_per_hour }}
+            </li>
         {% endfor %}
-
-
-
-</div>
-
-                
-                
-                
-                
-
-</body>
-
-
+    </ul>
 </body>
 </html>
