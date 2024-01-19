@@ -90,7 +90,7 @@ class LecturerResource(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=False)
         parser.add_argument('last_name', type=str, required=False)
-        parser.add_argument('uuid', type=str, required=True)
+        parser.add_argument('uuid', type=str, required=False)
         parser.add_argument('middle_name', type=str, required=False)
         parser.add_argument('title_before', type=str, required=False)
         parser.add_argument('title_after', type=str, required=False)
@@ -102,7 +102,7 @@ class LecturerResource(Resource):
         
         parser.add_argument('contact', type=dict, required=False)
         
-        parser.add_argument('tags', type=list, required=True, location='json')
+        parser.add_argument('tags', type=list, required=False, location='json')
         
 
         args = parser.parse_args()
