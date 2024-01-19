@@ -98,7 +98,7 @@ class LecturerResource(Resource):
         parser.add_argument('location', type=str, required=False)
         parser.add_argument('claim', type=str, required=False)
         parser.add_argument('bio', type=str, required=False)
-        parser.add_argument('price_per_hour', type=int, required=True)
+        parser.add_argument('price_per_hour', type=int, required=False)
         
         parser.add_argument('contact', type=dict, required=False)
         
