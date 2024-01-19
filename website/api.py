@@ -5,10 +5,8 @@ from flask_restful import Api, Resource, reqparse
 from .models import Teacher, Contact, Tag
 from . import db
 import uuid
-import json
 from uuid import UUID
-from collections import OrderedDict
-from flask import Flask, Response, json
+
 def generate_uuid():
     return str(uuid.uuid4())
 
@@ -26,11 +24,7 @@ def listToString(s):
     return (str1.join(s))
 import uuid
 
-class CustomJSONEncoder(json.JSONEncoder):
-    def encode(self, obj):
-        if isinstance(obj, OrderedDict):
-            return super(CustomJSONEncoder, self).encode(list(obj.items()))
-        return super(CustomJSONEncoder, self).encode(obj)
+
 
 class LecturerResource(Resource):
     def get(self, uuid=None):
@@ -116,10 +110,13 @@ class LecturerResource(Resource):
         tags = args.get("tags", [])
 
         
-       
-        telephone_numbers = args['contact']['telephone_numbers']
-        emails = args['contact']['emails']
+
+   
+            
         
+        
+        telephone_numbers = str(args['contact']['telephone_numbers'])
+        emails = str(args['contact']['emails'])
         uuid_str = str(args['uuid'])
         
         lecturer = Teacher(title_before = args['title_before'], first_name=args['first_name'], middle_name = args['middle_name'] , last_name=args['last_name'], title_after = args['title_after'] , picture_url = args['picture_url'], location = args['location'] , claim = args['claim'] , bio = args['bio'] , price_per_hour = args['price_per_hour'] , UUID=uuid_str)
@@ -130,43 +127,29 @@ class LecturerResource(Resource):
         if tags is not None:
             tag_objects = []
             for tag in tags:
-                if isinstance(tag, dict) and 'name' in tag:
-                    tag_name = tag['name']
-                    existing_tag = Tag.query.filter_by(name=tag_name).first()
-            
-                if existing_tag:
-                    # Tag with the same name exists, generate a new UUID
-                    new_uuid = str(uuid.uuid4())
-                    tag_objects.append(Tag(uuid=new_uuid, name=tag_name, teacher_id=lecturer.UUID))
+                if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
+                    existing_tag = Tag.query.filter_by(uuid=tag["uuid"]).first()
+                    if existing_tag:
+                        # Update the existing tag with the new lecturer's UUID
+                        existing_tag.teacher_id = lecturer.UUID
+                        tag_objects.append(existing_tag)
+                    else:
+                        tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=lecturer.UUID))
                 else:
-                # Tag does not exist, use the provided UUID or generate a new one
-                    tag_uuid = tag.get('uuid', str(uuid.uuid4()))
-                    tag_objects.append(Tag(uuid=tag_uuid, name=tag_name, teacher_id=lecturer.UUID))
-                
-
+                    return {'message': 'Each tag must be a dictionary with "uuid" and "name" keys'}
+        
+        
+            
             db.session.add_all(tag_objects)
             db.session.commit()
-        telephone_numbers = args['contact']['telephone_numbers']
-        emails = args['contact']['emails']
-        telephone_numbers_str = json.dumps(telephone_numbers)
-        emails_str = json.dumps(emails)
-        
-        
-        contact = Contact(
-            telephone_numbers=telephone_numbers_str,
-            emails=emails_str,
-            
-            teacher_id=lecturer.UUID
-        )   
-        
-        
+        contact = Contact(telephone_numbers = telephone_numbers, emails = emails, teacher_id = lecturer.UUID)
         db.session.add(contact)
         db.session.commit()
         
         
         
         tags_response = [{"uuid": tag.uuid, "name": tag.name} for tag in tag_objects] if tags else []
-        response_data = OrderedDict({
+        response_data = {
             "first_name": lecturer.first_name,
             "last_name": lecturer.last_name,
             "uuid": str(lecturer.UUID),
@@ -180,77 +163,34 @@ class LecturerResource(Resource):
             "tags": tags_response,  # Use the ordered list of tags
             "price_per_hour": lecturer.price_per_hour,
             "contact": {
-            "telephone_numbers": contact.telephone_numbers,
-            "emails": contact.emails
-            }})
+                "telephone_numbers": contact.telephone_numbers,
+                "emails": contact.emails
+            }
+            }
 
 
        
 
-        json_str = json.dumps(response_data, indent=2, ensure_ascii=False, sort_keys=False)
-        response = Response(json_str, content_type='application/json; charset=utf-8')
+        # Explicitly create a Flask Response
+        response = make_response(jsonify(response_data), 200)
         
         return response
 
 
     def put(self, uuid):
-        parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=str, required=False)
-        parser.add_argument('last_name', type=str, required=False)
-        parser.add_argument('middle_name', type=str, required=False)
-        parser.add_argument('title_before', type=str, required=False)
-        parser.add_argument('title_after', type=str, required=False)
-        parser.add_argument('picture_url', type=str, required=False)
-        parser.add_argument('location', type=str, required=False)
-        parser.add_argument('claim', type=str, required=False)
-        parser.add_argument('bio', type=str, required=False)
-        parser.add_argument('price_per_hour', type=int, required=False)
-        parser.add_argument('contact', type=dict, required=False)
-        parser.add_argument('tags', type=list, required=False, location='json')
-
         args = parser.parse_args()
         teacher = Teacher.query.filter_by(UUID=uuid).first()
 
         if teacher:
-            # Update teacher attributes
             teacher.title_before = args['title_before']
             teacher.first_name = args['first_name']
-            teacher.middle_name = args['middle_name']
-            teacher.last_name = args['last_name']
-            teacher.title_after = args['title_after']
-            teacher.picture_url = args['picture_url']
-            teacher.location = args['location']
-            teacher.claim = args['claim']
-            teacher.bio = args['bio']
-            teacher.price_per_hour = args['price_per_hour']
-
-            # Update contact information
-            contact = Contact.query.filter_by(teacher_id=uuid).first()
-            if contact:
-                contact.telephone_numbers = str(args['contact']['telephone_numbers'])
-                contact.emails = str(args['contact']['emails'])
-            
-            # Update tags
-            tags = args.get("tags", [])
-            if tags:
-                tag_objects = []
-                for tag in tags:
-                    if isinstance(tag, dict) and 'uuid' in tag and 'name' in tag:
-                        existing_tag = Tag.query.filter_by(uuid=tag["uuid"]).first()
-                        if existing_tag:
-                            existing_tag.teacher_id = teacher.UUID
-                            tag_objects.append(existing_tag)
-                        else:
-                            tag_objects.append(Tag(uuid=tag["uuid"], name=tag["name"], teacher_id=teacher.UUID))
-
-                db.session.add_all(tag_objects)
+            # Update other attributes as needed
 
             db.session.commit()
 
             return {'message': 'Lecturer updated successfully'}, 200
         else:
             return {'message': 'Lecturer not found'}, 404
-
     def delete(self, uuid=None):
         if uuid:
             # Handle DELETE request for a specific lecturer

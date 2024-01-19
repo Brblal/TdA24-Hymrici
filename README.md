@@ -35,7 +35,7 @@ Aplikace bude přístupná na `http://127.0.0.1:5000`
 #### Prerekvizity
 - Docker.
 - (Windows) aktivovaný wsl2.
-Návod zde: https://tourdeapp.cz/vzdelavaci-materialy/2738-instalace-dockeru-na-windowsrřujrs222yřus
+Návod zde: https://tourdeapp.cz/vzdelavaci-materialy/2738-instalace-dockeru-na-windowsrřujrsyřus
 
 #### Spuštění
 ```
